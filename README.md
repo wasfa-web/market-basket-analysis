@@ -43,7 +43,7 @@ Provides actionable recommendations (e.g., product bundling, promotions).
 
 The analysis was originally performed on the full Retail Transactions Dataset:
 
-Full dataset (Kaggle): Retail Transactions Dataset
+Full dataset (Kaggle): Retail Transactions Dataset:https://www.kaggle.com/datasets/prasad22/retail-transactions-dataset?resource=download
 
 For testing or demonstration, a smaller CSV can be uploaded via the Upload CSV option in the app.
 
