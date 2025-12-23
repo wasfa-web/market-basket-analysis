@@ -3,50 +3,49 @@ Market Basket Analysis Web App
 This project implements a Market Basket Analysis web application using Streamlit and PySpark. It allows users to explore frequent itemsets and association rules from transaction data using the FP-Growth algorithm.
 
 🔹 Features
-
-Load and preprocess data:
+Load and Preprocess Data
 
 Supports uploading a CSV file.
 
 Cleans product names and removes duplicates.
 
-Splits transactions into lists of items.
+Splits transactions into lists of items for analysis.
 
-Frequent itemset mining:
+Frequent Itemset Mining
 
 Uses PySpark's FP-Growth algorithm.
 
-Supports configurable minimum support and confidence.
+Configurable minimum support and confidence.
 
 Displays top N frequent itemsets and association rules.
 
-Visualization:
+Visualization
 
 Bar charts and pie charts for frequent itemsets.
 
 Bubble charts and network graphs for association rules.
 
-Interactive Streamlit dashboard.
+Fully interactive Streamlit dashboard.
 
-Export options:
+Export Options
 
 Download frequent itemsets and association rules as CSV.
 
 Download cleaned transaction data.
 
-Business insights:
+Business Insights
 
 Highlights strong association rules based on lift and confidence.
 
-Provides actionable recommendations (e.g., bundling products).
+Provides actionable recommendations (e.g., product bundling, promotions).
 
 📁 Dataset
 
-The analysis was originally performed on the full Retail Transactions Dataset (link below).
+The analysis was originally performed on the full Retail Transactions Dataset:
 
-For testing or demonstration, a smaller CSV can be uploaded via the Upload CSV option.
+Full dataset (Kaggle): Retail Transactions Dataset
 
-Full dataset: Kaggle Retail Transactions Dataset
+For testing or demonstration, a smaller CSV can be uploaded via the Upload CSV option in the app.
 
 Sample dataset: Provided within the repository (retail_transactions_sample.csv) or upload your own.
 
@@ -57,11 +56,17 @@ Run the Streamlit app:
 streamlit run app.py
 
 
-Configure Min Support, Min Confidence, and number of top itemsets/rules via the sidebar.
+Configure parameters via the sidebar:
+
+Min Support
+
+Min Confidence
+
+Top N Frequent Itemsets / Association Rules
 
 Upload a CSV file if desired.
 
-Explore tabs:
+Explore the following tabs:
 
 📦 Frequent Itemsets
 
@@ -81,10 +86,6 @@ Explore tabs:
 
 Default Spark configuration assumes HDFS path for the large dataset.
 
-Sample dataset is used for quick testing with smaller min support/confidence values.
+The sample dataset is used for quick testing with smaller min support/confidence values.
 
 For the full dataset, adjust min support/confidence to avoid too many frequent itemsets.
-## How to Run the Project
-1. Install required libraries:
-```bash
-pip install pyspark streamlit pandas plotly matplotlib networkx
