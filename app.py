@@ -52,7 +52,7 @@ def display_raw_data(df):
 
 # Sidebar - Dataset
 st.sidebar.header("📁 Dataset Options ")
-file_path = "hdfs://localhost:9000/user/vboxuser/data/Retail_Transactions_Dataset.csv"
+file_path = "data/retail_transactions.csv"
 upload_file = st.sidebar.file_uploader("📄 Or upload your CSV file", type="csv")
 
 if upload_file:
