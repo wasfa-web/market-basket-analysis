@@ -66,7 +66,7 @@ if upload_file:
     dataset_path = f"/tmp/{upload_file.name}"
     with open(dataset_path, "wb") as f:
         f.write(upload_file.getbuffer())
-    default_support, default_confidence = 0.5, 0.5
+    default_support, default_confidence = 0.05, 0.1
 else:
     dataset_path = default_file_path
     default_support, default_confidence = 0.002, 0.03
