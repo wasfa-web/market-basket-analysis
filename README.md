@@ -1,62 +1,74 @@
 Market Basket Analysis Web App
+Project Overview
 
-This project implements a Market Basket Analysis web application using Streamlit and PySpark. It allows users to explore frequent itemsets and association rules from transaction data using the FP-Growth algorithm.
+Interactive web application for analyzing retail transactions using FP-Growth with PySpark.
+The app extracts frequent itemsets and association rules to help businesses make decisions on product bundling, promotions, and insights.
 
-🔹 Features
-Load and Preprocess Data
+Features
 
-Supports uploading a CSV file.
+Load and clean transactional data (remove duplicates, handle missing values, standardize product names)
 
-Cleans product names and removes duplicates.
+FP-Growth for mining frequent itemsets and association rules (support, confidence, lift)
 
-Splits transactions into lists of items for analysis.
+Interactive dashboard with Streamlit
 
-Frequent Itemset Mining
+Visualizations:
 
-Uses PySpark's FP-Growth algorithm.
+Bar charts (Top Frequent Items)
 
-Configurable minimum support and confidence.
+Pie charts (Top Itemsets)
 
-Displays top N frequent itemsets and association rules.
+Bubble charts (Confidence vs Lift)
 
-Visualization
+Network graphs (Association Rules)
 
-Bar charts and pie charts for frequent itemsets.
+Export results and cleaned data as CSV
 
-Bubble charts and network graphs for association rules.
+Business insights with actionable recommendations
 
-Fully interactive Streamlit dashboard.
+Technologies Used
 
-Export Options
+Python
 
-Download frequent itemsets and association rules as CSV.
+PySpark
 
-Download cleaned transaction data.
+Streamlit
 
-Business Insights
+Pandas
 
-Highlights strong association rules based on lift and confidence.
+Plotly
 
-Provides actionable recommendations (e.g., product bundling, promotions).
+Matplotlib
 
-📁 Dataset
+NetworkX
 
-The analysis was originally performed on the full Retail Transactions Dataset:
+Dataset
 
-Full dataset (Kaggle): Retail Transactions Dataset:https://www.kaggle.com/datasets/prasad22/retail-transactions-dataset?resource=download
+Sample dataset (included for quick testing): retail_transactions_sample.csv
 
-For testing or demonstration, a smaller CSV can be uploaded via the Upload CSV option in the app.
+Full dataset (large, optional): Retail Transactions Dataset on Kaggle
 
-Sample dataset: Provided within the repository (retail_transactions_sample.csv) or upload your own.
+Note: The code can run with the sample dataset for review. Use the full dataset for complete analysis. Adjust support/confidence parameters to avoid too many frequent itemsets.
 
-⚙️ Usage
+How to Run
 
-Run the Streamlit app:
+Clone the repository:
+
+git clone <repo-url>
+cd market-basket-analysis
+
+
+Install dependencies:
+
+pip install pyspark streamlit pandas plotly matplotlib networkx
+
+
+Run the app:
 
 streamlit run app.py
 
 
-Configure parameters via the sidebar:
+Configure parameters in the sidebar:
 
 Min Support
 
@@ -64,9 +76,9 @@ Min Confidence
 
 Top N Frequent Itemsets / Association Rules
 
-Upload a CSV file if desired.
+Upload your CSV (optional)
 
-Explore the following tabs:
+Explore tabs:
 
 📦 Frequent Itemsets
 
@@ -82,10 +94,10 @@ Explore the following tabs:
 
 📄 Export Cleaned Data
 
-🔧 Notes
+Notes
 
-Default Spark configuration assumes HDFS path for the large dataset.
+Optimized for large datasets via PySpark; sample dataset used for quick testing.
 
-The sample dataset is used for quick testing with smaller min support/confidence values.
+Adjust min support and min confidence when running full dataset to control output size.
 
-For the full dataset, adjust min support/confidence to avoid too many frequent itemsets.
+Visualizations and metrics are limited to safe subsets for memory efficiency.
