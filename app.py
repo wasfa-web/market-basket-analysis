@@ -52,7 +52,7 @@ def display_raw_data(df):
 
 # Sidebar - Dataset
 st.sidebar.header("📁 Dataset Options ")
-file_path = "data/retail_transactions.csv"
+file_path = "/workspaces/market-basket-analysis/retail_transactions_sample.csv"
 upload_file = st.sidebar.file_uploader("📄 Or upload your CSV file", type="csv")
 
 if upload_file:
