@@ -15,11 +15,13 @@ import os
 st.set_page_config(page_title="Market Basket Analysis", layout="wide")
 
 # -------------------------
-# Start Spark session
+# Start Spark session (only once)
 # -------------------------
-spark = SparkSession.builder \
-    .appName("MarketBasketAnalysis") \
-    .getOrCreate()
+if "spark" not in st.session_state:
+    st.session_state.spark = SparkSession.builder \
+        .appName("MarketBasketAnalysis") \
+        .getOrCreate()
+spark = st.session_state.spark
 
 # -------------------------
 # Utility functions
@@ -48,9 +50,9 @@ def preprocess_data(df):
     df = df.withColumn("items", array_distinct(col("items")))
     return df.select("items")
 
-def display_raw_data(df):
-    df_sample = df.limit(100).toPandas()
-    st.subheader("🧾 Raw Transaction Data (First 100 rows)")
+def display_raw_data(df, n=100):
+    df_sample = df.limit(n).toPandas()
+    st.subheader(f"🧾 Raw Transaction Data (First {n} rows)")
     st.dataframe(df_sample)
 
 # -------------------------
@@ -90,6 +92,7 @@ if st.sidebar.button("🚀 Start Analysis"):
     st.session_state["top_n_rules"] = top_n_rules
 if st.sidebar.button("🔄 Reset"):
     st.session_state.clear()
+    st.experimental_rerun()
 
 # -------------------------
 # Load and preprocess data
@@ -98,7 +101,6 @@ def load_data():
     if not os.path.exists(dataset_path):
         st.error(f"File not found: {dataset_path}")
         st.stop()
-    # Load using pandas first to avoid Spark CSV error on Codespaces
     pdf = pd.read_csv(dataset_path)
     st.subheader("🧾 Raw Transaction Data")
     st.dataframe(pdf.head(100))
@@ -118,41 +120,39 @@ def run_fpgrowth(df, support, confidence):
     return model.freqItemsets.orderBy("freq", ascending=False), rules_df.orderBy("lift", ascending=False)
 
 # -------------------------
-# Visualization functions
+# Visualization functions (safe for large datasets)
 # -------------------------
-def plot_bar_chart(freq_df):
-    df = freq_df.toPandas()
+def plot_bar_chart(freq_df, n=top_n_items):
+    df = freq_df.limit(1000).toPandas()  # limit to avoid memory issues
     df["items"] = df["items"].apply(lambda x: ", ".join(x))
     df["freq"] = df["freq"].apply(format_float)
-    df_sorted = df.sort_values(by="freq", ascending=False).head(top_n_items)
-    fig = px.bar(df_sorted, x='freq', y='items', orientation='h',
-                 title="Top Frequent Items", text='freq')
+    df_sorted = df.sort_values(by="freq", ascending=False).head(n)
+    fig = px.bar(df_sorted, x='freq', y='items', orientation='h', title="Top Frequent Items", text='freq')
     fig.update_layout(yaxis=dict(autorange="reversed"))
     st.plotly_chart(fig, use_container_width=True)
 
-def plot_pie_chart(freq_df):
-    df = freq_df.limit(10).toPandas()
+def plot_pie_chart(freq_df, n=10):
+    df = freq_df.limit(n).toPandas()
     df["items"] = df["items"].apply(lambda x: ", ".join(x))
     fig = px.pie(df, values="freq", names="items", title="Top Frequent Itemsets (Pie Chart)")
     st.plotly_chart(fig, use_container_width=True)
 
-def plot_bubble_chart(rules_df):
-    df = rules_df.toPandas()
+def plot_bubble_chart(rules_df, n=1000):
+    df = rules_df.limit(n).toPandas()
     if df.empty:
         st.warning("No rules to display.")
         return
     df["antecedent"] = df["antecedent"].apply(lambda x: ", ".join(x))
-    fig = px.scatter(df, x="confidence", y="lift", size="lift", color="antecedent",
-                     title="Bubble Chart: Confidence vs Lift")
+    fig = px.scatter(df, x="confidence", y="lift", size="lift", color="antecedent", title="Bubble Chart: Confidence vs Lift")
     st.plotly_chart(fig, use_container_width=True)
 
-def plot_network_graph(rules_df):
-    df = rules_df.toPandas()
+def plot_network_graph(rules_df, n=15):
+    df = rules_df.limit(n).toPandas()
     if df.empty:
         st.warning("No rules to visualize.")
         return
     G = nx.DiGraph()
-    for _, row in df.head(15).iterrows():
+    for _, row in df.iterrows():
         a = ", ".join(row["antecedent"]) if isinstance(row["antecedent"], list) else row["antecedent"]
         c = ", ".join(row["consequent"]) if isinstance(row["consequent"], list) else row["consequent"]
         G.add_edge(a, c)
@@ -222,15 +222,15 @@ if "freq_df" in st.session_state and "rules_df" in st.session_state:
     # Export results
     with tabs[3]:
         st.header("📄 Export Results")
-        df_freq = freq_df.toPandas()
-        df_rules = rules_df.toPandas()
+        df_freq = freq_df.limit(1000).toPandas()
+        df_rules = rules_df.limit(1000).toPandas()
         st.download_button("📅 Download Frequent Itemsets", df_freq.to_csv(index=False).encode(), file_name="frequent_itemsets.csv")
         st.download_button("📅 Download Association Rules", df_rules.to_csv(index=False).encode(), file_name="association_rules.csv")
 
     # Business insights
     with tabs[4]:
         st.header("💡 Business Insights")
-        df_rules_pd = rules_df.toPandas()
+        df_rules_pd = rules_df.limit(1000).toPandas()
         insights = df_rules_pd[(df_rules_pd["lift"] >= 1.2) & (df_rules_pd["confidence"] >= 0.1)].head(5)
         if insights.empty:
             st.warning("No strong business insights found.")
@@ -245,15 +245,17 @@ if "freq_df" in st.session_state and "rules_df" in st.session_state:
                 </div>
             """, unsafe_allow_html=True)
 
-    # Dashboard overview
+    # Dashboard overview (safe aggregation)
     with tabs[5]:
         st.header("📊 Dashboard Overview")
         col1, col2, col3 = st.columns(3)
         col1.metric("🧾 Total Transactions", df.count())
         col2.metric("📦 Frequent Itemsets", freq_df.count())
         col3.metric("🔗 Association Rules", rules_df.count())
-        col1.metric("📈 Max Lift", format_float(rules_df.agg({"lift": "max"}).collect()[0][0]))
-        col2.metric("📉 Avg Confidence", format_float(rules_df.agg({"confidence": "avg"}).collect()[0][0]))
+        max_lift = rules_df.agg({"lift": "max"}).collect()[0][0]
+        avg_conf = rules_df.agg({"confidence": "avg"}).collect()[0][0]
+        col1.metric("📈 Max Lift", format_float(max_lift))
+        col2.metric("📉 Avg Confidence", format_float(avg_conf))
 
     # Export cleaned data
     with tabs[6]:
