@@ -9,12 +9,11 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 # Streamlit UI config
-st.set_page_config(page_title=" Market Basket Analysis", layout="wide")
+st.set_page_config(page_title="Market Basket Analysis", layout="wide")
 
-# Start Spark session
+# Start Spark session (بدون HDFS)
 spark = SparkSession.builder \
     .appName("MarketBasketAnalysis") \
-    .config("spark.hadoop.fs.defaultFS", "hdfs://localhost:9000") \
     .getOrCreate()
 
 # Format float values for display
@@ -83,10 +82,7 @@ if st.sidebar.button("🔄 Reset"):
 
 # Load and clean data
 def load_data():
-    if upload_file:
-        df = spark.read.csv(dataset_path, header=True, inferSchema=True)
-    else:
-        df = spark.read.csv(file_path, header=True, inferSchema=True)
+    df = spark.read.csv(dataset_path, header=True, inferSchema=True)
     display_raw_data(df)
     return preprocess_data(df)
 
@@ -154,7 +150,7 @@ if st.session_state.get("run", False):
         st.session_state["freq_df"] = freq_df
         st.session_state["rules_df"] = rules_df
 
-# Tabs
+# Tabs and dashboards
 if "freq_df" in st.session_state and "rules_df" in st.session_state:
     df = st.session_state["df"]
     freq_df = st.session_state["freq_df"]
@@ -204,14 +200,13 @@ if "freq_df" in st.session_state and "rules_df" in st.session_state:
         insights = df_rules[(df_rules["lift"] >= 1.2) & (df_rules["confidence"] >= 0.1)].head(5)
         if insights.empty:
             st.warning("No strong business insights found using default thresholds.")
-            st.markdown("Fallback: Showing top available rules due to limited high-confidence insights.")
             insights = df_rules.sort_values(["lift", "confidence"], ascending=False).head(3)
         for _, row in insights.iterrows():
             st.markdown(f"""
                 <div style='background-color: #2a2a2a; color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;'>
                 <strong>Rule:</strong> If a customer buys <em>{row['antecedent']}</em>, they also tend to buy <em>{row['consequent']}</em>.<br>
-                <strong>Lift:</strong> {format_float(row['lift'])} – measures strength of the rule.<br>
-                <strong>Confidence:</strong> {format_float(row['confidence'])} – probability of consequent given antecedent.<br>
+                <strong>Lift:</strong> {format_float(row['lift'])}<br>
+                <strong>Confidence:</strong> {format_float(row['confidence'])}<br>
                 <strong>Recommendation:</strong> Consider bundling or joint promotions.
                 </div>
             """, unsafe_allow_html=True)
