@@ -39,10 +39,11 @@ The app extracts **frequent itemsets** and **association rules** to help busines
 ## Dataset
 
 * **Sample dataset (included for quick testing):** `retail_transactions_sample.csv`
-* **Full dataset (large, optional):** [Retail Transactions Dataset on Kaggle](https://www.kaggle.com/datasets/prasad22/retail-transactions-dataset?resource=download)
+* **Full dataset (used for complete analysis):** [Retail Transactions Dataset on Kaggle](https://www.kaggle.com/datasets/prasad22/retail-transactions-dataset?resource=download)
 
-> **Note:** The code can run with the sample dataset for review. Use the full dataset for complete analysis. Adjust support/confidence parameters to avoid too many frequent itemsets.
+The full analysis was performed on a retail dataset containing **1,000,000 transactions across 81 unique products**. The repository includes a smaller sample dataset for quick testing, while the full dataset is linked separately due to its size.
 
+> **Note:** The code can run with the sample dataset for review. Use the full dataset for complete analysis and adjust support/confidence parameters as needed to control the number of frequent itemsets and association rules.
 ---
 
 ## How to Run
